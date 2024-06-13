@@ -65,7 +65,6 @@ def melspectrogram(wav, hparams):
     return S
 
 def inv_linear_spectrogram(linear_spectrogram, hparams):
-    """Converts linear spectrogram to waveform using librosa"""
     if hparams.signal_normalization:
         D = _denormalize(linear_spectrogram, hparams)
     else:
@@ -103,9 +102,6 @@ def _lws_processor(hparams):
     return lws.lws(hparams.n_fft, get_hop_size(hparams), fftsize=hparams.win_size, mode="speech")
 
 def _griffin_lim(S, hparams):
-    """librosa implementation of Griffin-Lim
-    Based on https://github.com/librosa/librosa/issues/434
-    """
     angles = np.exp(2j * np.pi * np.random.rand(*S.shape))
     S_complex = np.abs(S).astype(np.complex)
     y = _istft(S_complex * angles, hparams)
@@ -123,8 +119,6 @@ def _stft(y, hparams):
 def _istft(y, hparams):
     return librosa.istft(y, hop_length=get_hop_size(hparams), win_length=hparams.win_size)
 
-##########################################################
-#Those are only correct when using lws!!! (This was messing with Wavenet quality for a long time!)
 def num_frames(length, fsize, fshift):
     """Compute number of time frames of spectrogram
     """
@@ -137,15 +131,12 @@ def num_frames(length, fsize, fshift):
 
 
 def pad_lr(x, fsize, fshift):
-    """Compute left and right padding
-    """
     M = num_frames(len(x), fsize, fshift)
     pad = (fsize - fshift)
     T = len(x) + 2 * pad
     r = (M - 1) * fshift + fsize - T
     return pad, pad + r
-##########################################################
-#Librosa correct padding
+
 def librosa_pad_lr(x, fsize, fshift):
     return 0, (x.shape[0] // fshift + 1) * fshift - x.shape[0]
 

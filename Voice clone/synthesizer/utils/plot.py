@@ -2,10 +2,7 @@ import numpy as np
 
 
 def split_title_line(title_text, max_words=5):
-	"""
-	A function that splits any string based on specific character
-	(returning it with the string), with maximum number of words on it
-	"""
+	
 	seq = title_text.split()
 	return "\n".join([" ".join(seq[i:i + max_words]) for i in range(0, len(seq), max_words)])
 

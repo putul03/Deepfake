@@ -16,12 +16,6 @@ class Synthesizer:
     hparams = hparams
 
     def __init__(self, model_fpath: Path, verbose=True):
-        """
-        The model isn't instantiated and loaded in memory until needed or until load() is called.
-
-        :param model_fpath: path to the trained model file
-        :param verbose: if False, prints less information when using the model
-        """
         self.model_fpath = model_fpath
         self.verbose = verbose
 
@@ -37,15 +31,9 @@ class Synthesizer:
         self._model = None
 
     def is_loaded(self):
-        """
-        Whether the model is loaded in memory.
-        """
         return self._model is not None
 
     def load(self):
-        """
-        Instantiates and loads the model given the weights file that was passed in the constructor.
-        """
         self._model = Tacotron(embed_dims=hparams.tts_embed_dims,
                                num_chars=len(symbols),
                                encoder_dims=hparams.tts_encoder_dims,
@@ -70,18 +58,6 @@ class Synthesizer:
     def synthesize_spectrograms(self, texts: List[str],
                                 embeddings: Union[np.ndarray, List[np.ndarray]],
                                 return_alignments=False):
-        """
-        Synthesizes mel spectrograms from texts and speaker embeddings.
-
-        :param texts: a list of N text prompts to be synthesized
-        :param embeddings: a numpy array or list of speaker embeddings of shape (N, 256)
-        :param return_alignments: if True, a matrix representing the alignments between the
-        characters
-        and each decoder output step will be returned for each spectrogram
-        :return: a list of N melspectrograms as numpy arrays of shape (80, Mi), where Mi is the
-        sequence length of spectrogram i, and possibly the alignments.
-        """
-        # Load the model on the first request.
         if not self.is_loaded():
             self.load()
 
@@ -129,10 +105,6 @@ class Synthesizer:
 
     @staticmethod
     def load_preprocess_wav(fpath):
-        """
-        Loads and preprocesses an audio file under the same conditions the audio files were used to
-        train the synthesizer.
-        """
         wav = librosa.load(str(fpath), hparams.sample_rate)[0]
         if hparams.rescale:
             wav = wav / np.abs(wav).max() * hparams.rescaling_max
@@ -140,10 +112,7 @@ class Synthesizer:
 
     @staticmethod
     def make_spectrogram(fpath_or_wav: Union[str, Path, np.ndarray]):
-        """
-        Creates a mel spectrogram from an audio file in the same manner as the mel spectrograms that
-        were fed to the synthesizer when training.
-        """
+
         if isinstance(fpath_or_wav, str) or isinstance(fpath_or_wav, Path):
             wav = Synthesizer.load_preprocess_wav(fpath_or_wav)
         else:
@@ -154,10 +123,7 @@ class Synthesizer:
 
     @staticmethod
     def griffin_lim(mel):
-        """
-        Inverts a mel spectrogram using Griffin-Lim. The mel spectrogram is expected to have been built
-        with the same parameters present in hparams.py.
-        """
+
         return audio.inv_mel_spectrogram(mel, hparams)
 
 

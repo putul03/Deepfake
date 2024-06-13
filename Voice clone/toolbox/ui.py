@@ -37,7 +37,7 @@ colormap = np.array([
 ], dtype=np.float) / 255
 
 default_text = \
-    "Welcome to the Robotics Society, NIT Hamirpur " 
+    "Welcome! " 
 class UI(QDialog):
     min_umap_points = 4
     max_log_lines = 5

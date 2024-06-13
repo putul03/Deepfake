@@ -26,12 +26,9 @@ if __name__ == '__main__':
     arg_dict = vars(args)
     print_args(args, parser)
 
-    # Hide GPUs from Pytorch to force CPU processing
     if arg_dict.pop("cpu"):
         os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
-    # Remind the user to download pretrained models if needed
     ensure_default_models(args.models_dir)
 
-    # Launch the toolbox
     Toolbox(**arg_dict)

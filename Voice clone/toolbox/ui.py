@@ -37,19 +37,7 @@ colormap = np.array([
 ], dtype=np.float) / 255
 
 default_text = \
-    "Welcome to the toolbox! To begin, load an utterance from your datasets or record one " \
-    "yourself.\nOnce its embedding has been created, you can synthesize any text written here.\n" \
-    "The synthesizer expects to generate " \
-    "outputs that are somewhere between 5 and 12 seconds.\nTo mark breaks, write a new line. " \
-    "Each line will be treated separately.\nThen, they are joined together to make the final " \
-    "spectrogram. Use the vocoder to generate audio.\nThe vocoder generates almost in constant " \
-    "time, so it will be more time efficient for longer inputs like this one.\nOn the left you " \
-    "have the embedding projections. Load or record more utterances to see them.\nIf you have " \
-    "at least 2 or 3 utterances from a same speaker, a cluster should form.\nSynthesized " \
-    "utterances are of the same color as the speaker whose voice was used, but they're " \
-    "represented with a cross."
-
-
+    "Welcome to the Robotics Society, NIT Hamirpur " 
 class UI(QDialog):
     min_umap_points = 4
     max_log_lines = 5
@@ -63,8 +51,6 @@ class UI(QDialog):
         embed_ax, _ = self.current_ax if which == "current" else self.gen_ax
         embed_ax.figure.suptitle("" if embed is None else name)
 
-        ## Embedding
-        # Clear the plot
         if len(embed_ax.images) > 0:
             embed_ax.images[0].colorbar.remove()
         embed_ax.clear()
@@ -422,36 +408,22 @@ class UI(QDialog):
         [self.log("") for _ in range(self.max_log_lines)]
 
     def __init__(self):
-        ## Initialize the application
+    
         self.app = QApplication(sys.argv)
         super().__init__(None)
         self.setWindowTitle("SV2TTS toolbox")
-
-
-        ## Main layouts
-        # Root
         root_layout = QGridLayout()
         self.setLayout(root_layout)
-
-        # Browser
         browser_layout = QGridLayout()
         root_layout.addLayout(browser_layout, 0, 0, 1, 2)
-
-        # Generation
         gen_layout = QVBoxLayout()
         root_layout.addLayout(gen_layout, 0, 2, 1, 2)
-
-        # Projections
         self.projections_layout = QVBoxLayout()
         root_layout.addLayout(self.projections_layout, 1, 0, 1, 1)
 
-        # Visualizations
         vis_layout = QVBoxLayout()
         root_layout.addLayout(vis_layout, 1, 1, 1, 3)
 
-
-        ## Projections
-        # UMap
         fig, self.umap_ax = plt.subplots(figsize=(3, 3), facecolor="#F0F0F0")
         fig.subplots_adjust(left=0.02, bottom=0.02, right=0.98, top=0.98)
         self.projections_layout.addWidget(FigureCanvas(fig))
@@ -459,9 +431,6 @@ class UI(QDialog):
         self.clear_button = QPushButton("Clear")
         self.projections_layout.addWidget(self.clear_button)
 
-
-        ## Browser
-        # Dataset, speaker and utterance selection
         i = 0
         self.dataset_box = QComboBox()
         browser_layout.addWidget(QLabel("<b>Dataset</b>"), i, 0)
@@ -593,9 +562,6 @@ class UI(QDialog):
         gen_layout.addWidget(self.log_window)
         self.logs = []
         gen_layout.addStretch()
-
-
-        ## Set the size of the window and of the elements
         max_size = QDesktopWidget().availableGeometry(self).size() * 0.8
         self.resize(max_size)
 

@@ -11,15 +11,6 @@ _model = None
 _device = None 
 
 def load_model(weights_fpath: Path, device=None):
-    """
-    Loads the model in memory. If this function is not explicitely called, it will be run on the
-    first call to embed_frames() with the default weights file.
-
-    :param weights_fpath: the path to saved model weights.
-    :param device: either a torch device or the name of a torch device (e.g. "cpu", "cuda"). The
-    model will be loaded and will run on this device. Outputs will however always be on the cpu.
-    If None, will default to your GPU if it"s available, otherwise your CPU.
-    """
 
     global _model, _device
     if device is None:
@@ -38,13 +29,7 @@ def is_loaded():
 
 
 def embed_frames_batch(frames_batch):
-    """
-    Computes embeddings for a batch of mel spectrogram.
-
-    :param frames_batch: a batch mel of spectrogram as a numpy array of float32 of shape
-    (batch_size, n_frames, n_channels)
-    :return: the embeddings as a numpy array of float32 of shape (batch_size, model_embedding_size)
-    """
+   
     if _model is None:
         raise Exception("Model was not loaded. Call load_model() before inference.")
 

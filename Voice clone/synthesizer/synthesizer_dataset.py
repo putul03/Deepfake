@@ -24,8 +24,6 @@ class SynthesizerDataset(Dataset):
         print("Found %d samples" % len(self.samples_fpaths))
     
     def __getitem__(self, index):  
-        # Sometimes index may be a list of 2 (not sure why this happens)
-        # If that is the case, return a single item corresponding to first element in index
         if index is list:
             index = index[0]
 
@@ -60,9 +58,6 @@ def collate_synthesizer(batch, r, hparams):
     max_spec_len = max(spec_lens) + 1 
     if max_spec_len % r != 0:
         max_spec_len += r - max_spec_len % r 
-
-    # WaveRNN mel spectrograms are normalized to [0, 1] so zero padding adds silence
-    # By default, SV2TTS uses symmetric mels, where -1*max_abs_value is silence.
     if hparams.symmetric_mels:
         mel_pad_value = -1 * hparams.max_abs_value
     else:

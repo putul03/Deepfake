@@ -41,7 +41,6 @@ if __name__ == "__main__":
         "Preprocess audio without trimming silences (not recommended).")
     args = parser.parse_args()
 
-    # Verify webrtcvad is available
     if not args.no_trim:
         try:
             import webrtcvad
@@ -51,14 +50,12 @@ if __name__ == "__main__":
                 "use --no_trim to disable this error message.")
     del args.no_trim
 
-    # Process the arguments
     args.datasets = args.datasets.split(",")
     if not hasattr(args, "out_dir"):
         args.out_dir = args.datasets_root.joinpath("SV2TTS", "encoder")
     assert args.datasets_root.exists()
     args.out_dir.mkdir(exist_ok=True, parents=True)
 
-    # Preprocess the datasets
     print_args(args, parser)
     preprocess_func = {
         "librispeech_other": preprocess_librispeech,

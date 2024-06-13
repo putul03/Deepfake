@@ -164,39 +164,13 @@ def split_on_silences(wav_fpath, words, end_times, hparams):
     wavs = [wav[segment_time[0]:segment_time[1]] for segment_time in segment_times]
     texts = [" ".join(words[start + 1:end]).replace("  ", " ") for start, end in segments]
 
-    # # DEBUG: play the audio segments (run with -n=1)
-    # import sounddevice as sd
-    # if len(wavs) > 1:
-    #     print("This sentence was split in %d segments:" % len(wavs))
-    # else:
-    #     print("There are no silences long enough for this sentence to be split:")
-    # for wav, text in zip(wavs, texts):
-    #     # Pad the waveform with 1 second of silence because sounddevice tends to cut them early
-    #     # when playing them. You shouldn't need to do that in your parsers.
-    #     wav = np.concatenate((wav, [0] * 16000))
-    #     print("\t%s" % text)
-    #     sd.play(wav, 16000, blocking=True)
-    # print("")
 
     return wavs, texts
 
 
 def process_utterance(wav: np.ndarray, text: str, out_dir: Path, basename: str,
                       skip_existing: bool, hparams):
-    ## FOR REFERENCE:
-    # For you not to lose your head if you ever wish to change things here or implement your own
-    # synthesizer.
-    # - Both the audios and the mel spectrograms are saved as numpy arrays
-    # - There is no processing done to the audios that will be saved to disk beyond volume
-    #   normalization (in split_on_silences)
-    # - However, pre-emphasis is applied to the audios before computing the mel spectrogram. This
-    #   is why we re-apply it on the audio on the side of the vocoder.
-    # - Librosa pads the waveform before computing the mel spectrogram. Here, the waveform is saved
-    #   without extra padding. This means that you won't have an exact relation between the length
-    #   of the wav and of the mel spectrogram. See the vocoder data loader.
 
-
-    # Skip existing utterances if needed
     mel_fpath = out_dir.joinpath("mels", "mel-%s.npy" % basename)
     wav_fpath = out_dir.joinpath("audio", "audio-%s.npy" % basename)
     if skip_existing and mel_fpath.exists() and wav_fpath.exists():
@@ -250,8 +224,6 @@ def create_embeddings(synthesizer_root: Path, encoder_model_fpath: Path, n_proce
         metadata = [line.split("|") for line in metadata_file]
         fpaths = [(wav_dir.joinpath(m[0]), embed_dir.joinpath(m[2])) for m in metadata]
 
-    # TODO: improve on the multiprocessing, it's terrible. Disk I/O is the bottleneck here.
-    # Embed the utterances in separate threads
     func = partial(embed_utterance, encoder_model_fpath=encoder_model_fpath)
     job = Pool(n_processes).imap(func, fpaths)
     list(tqdm(job, "Embedding", len(fpaths), unit="utterances"))
